@@ -18,7 +18,7 @@ class Base extends \Hoathis\Kit\Aggregator {
   protected function LoadPost ( $kit, $id ) {
 
     try {
-      $post = \Application\Model\Post::findById($id);
+      $post = \Application\Model\Post::findByIdAndState($id);
     }
     catch (\Hoathis\Model\Exception\NotFound $e) {
       $kit->getKit('Redirector')

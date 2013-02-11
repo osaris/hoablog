@@ -23,6 +23,13 @@
                value-formatter-format="Y-m-d" />
       </p>
       <p>
+        <label for="state">State</label>
+        <select>
+          <option value="0" selected="(?draft)">Draft</option>
+          <option value="1" selected="(?published)">Published</option>
+        </select>
+      </p>
+      <p>
         <input type="submit" />
       </p>
   </snippet>

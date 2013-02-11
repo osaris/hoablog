@@ -6,6 +6,7 @@ CREATE TABLE post (
     title   VARCHAR(255),
     posted  TIMESTAMP,
     content LONGVARCHAR,
+    state   INTEGER,
 
     PRIMARY KEY(id)
 );
@@ -28,45 +29,51 @@ CREATE TABLE user (
     PRIMARY KEY(name)
 );
 
-INSERT INTO post ( id, title, posted, content ) VALUES (
+INSERT INTO post ( id, title, posted, content, state ) VALUES (
     0,
     'Call me Ph.D!',
     942879600,
-    'My thesis was accepted. What a long labor! Well, it is finally over. The harder part was to resume the title. You know, in Theoretical Physics, thesis have always very short and concise titles. Mine is quite simple; here it is: Observation of Einstein-Podolsky-Rosen Entanglement on Supraquantum Structures by Induction Through Nonlinear Transuranic Crystal of Extremely Long Wavelength (ELW) Pulse from Mode-Locked Source Array. I can gladly send you a copy if you want.');
+    'My thesis was accepted. What a long labor! Well, it is finally over. The harder part was to resume the title. You know, in Theoretical Physics, thesis have always very short and concise titles. Mine is quite simple; here it is: Observation of Einstein-Podolsky-Rosen Entanglement on Supraquantum Structures by Induction Through Nonlinear Transuranic Crystal of Extremely Long Wavelength (ELW) Pulse from Mode-Locked Source Array. I can gladly send you a copy if you want.',
+    1);
 
 INSERT INTO post ( id, title, posted, content ) VALUES (
     1,
     'Dr. Isaac Kleiner, my mentor, has hired me at Black Mesa Research Facility',
     957477600,
-    'Well, I was so disappointed by the weak interest of university for teleportation that I decided to look for a job in the private sector. But, you know, life is awesome. How lucky I am. My mentor, Dr. Isaac Kleiner, proposed me a job at the Black Mesa Research \o/. Really excited to start.'
+    'Well, I was so disappointed by the weak interest of university for teleportation that I decided to look for a job in the private sector. But, you know, life is awesome. How lucky I am. My mentor, Dr. Isaac Kleiner, proposed me a job at the Black Mesa Research \o/. Really excited to start.',
+    1
 );
 
 INSERT INTO post ( id, title, posted, content ) VALUES (
     2,
     'Great party in the Anomalous Materials department with collegues!',
     976834800,
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.'
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.',
+    1
 );
 
 INSERT INTO post ( id, title, posted, content ) VALUES (
     3,
     'I think I have made a blunder at Black Mesa',
     976921200,
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.'
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.',
+    1
 );
 
 INSERT INTO post ( id, title, posted, content ) VALUES (
     4,
     'ping -f Nihilanth',
     978476400,
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.'
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.',
+    1
 );
 
 INSERT INTO post ( id, title, posted, content ) VALUES (
     5,
     'G-Man or the hard deal',
     978822000,
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.'
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu libero nisi, nec convallis tortor. Quisque non malesuada turpis. Aliquam rhoncus, erat eget fermentum gravida, nisi odio porta nisi, ac imperdiet dolor arcu sit amet nulla. Curabitur turpis nunc, sagittis a suscipit ut, scelerisque ac justo. Duis urna risus, fringilla et porta eget, dictum pulvinar magna. In quis auctor massa.',
+    1
 );
 
 

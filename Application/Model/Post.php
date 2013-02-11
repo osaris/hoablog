@@ -17,10 +17,15 @@ namespace Application\Model {
 
 class Post extends \Hoa\Model {
 
+    const STATE_ALL       = -1;
+    const STATE_DRAFT     = 0;
+    const STATE_PUBLISHED = 1;
+
     protected $_id;
     protected $_title;
     protected $_posted;
     protected $_content;
+    protected $_state;
 
     /**
      * @invariant comments: relation('Application\Model\Comment', boundinteger(0));
@@ -32,20 +37,24 @@ class Post extends \Hoa\Model {
         $this->setMappingLayer(\Hoa\Database\Dal::getLastInstance());
 
         $this->posted = time();
+        $this->state = Post::STATE_DRAFT;
 
         return;
     }
 
-    static public function findById ( $id ) {
+    static public function findByIdAndState ( $id, $state = STATE_PUBLISHED ) {
 
         $post = new Post();
         $data = $post->getMappingLayer()
                      ->prepare(
-                         'SELECT id, posted, title, content ' .
+                         'SELECT id, posted, title, content, state ' .
                          'FROM   post ' .
-                         'WHERE  id = :id'
+                         'WHERE  id = :id ' .
+                         'AND (state1 = :state OR :state2 = -1)'
                      )
-                     ->execute(array('id' => $id))
+                     ->bindParam(':id', $id, PDO::PARAM_INT)
+                     ->bindParam(':state1', $state, PDO::PARAM_INT)
+                     ->bindParam(':state2', $state, PDO::PARAM_INT)
                      ->fetchAll();
 
         if(!empty($data)) {
@@ -75,6 +84,7 @@ class Post extends \Hoa\Model {
             $this->title   = trim(strip_tags($attributes['title']));
             $this->content = trim($attributes['content']);
             $this->posted  = strtotime(trim(strip_tags($attributes['posted'])));
+            $this->state   = trim(strip_tags($attributes['state']));
         }
         catch (\Hoa\Model\Exception $e) {
             throw new \Hoathis\Model\Exception\ValidationFailed($e->getMessage());
@@ -83,13 +93,14 @@ class Post extends \Hoa\Model {
         return $this->getMappingLayer()
                     ->prepare(
                         'UPDATE post SET title = :title, content = :content, ' .
-                        'posted = :posted ' .
+                        'posted = :posted, state = :state ' .
                         'WHERE  id = :id'
                     )
                     ->execute(array(
                         'title'   => $this->title,
                         'content' => $this->content,
                         'posted'  => $this->posted,
+                        'state'   => $this->state,
                         'id'      => $this->id
                     ));
     }
@@ -100,6 +111,7 @@ class Post extends \Hoa\Model {
             $this->title   = trim(strip_tags($attributes["title"]));
             $this->content = trim(strip_tags($attributes["content"]));
             $this->posted  = strtotime(trim(strip_tags($attributes["posted"])));
+            $this->state   = trim(strip_tags($attributes['state']));
         }
         catch (\Hoa\Model\Exception $e) {
             throw new \Hoathis\Model\Exception\ValidationFailed($e->getMessage());
@@ -107,13 +119,14 @@ class Post extends \Hoa\Model {
 
         $this->getMappingLayer()
              ->prepare(
-                'INSERT INTO post (title, content, posted) ' .
-                'VALUES (:title, :content, :posted)'
+                'INSERT INTO post (title, content, posted, state) ' .
+                'VALUES (:title, :content, :posted, :state)'
              )
              ->execute(array(
                 'title'   => $this->title,
                 'content' => $this->content,
-                'posted'  => $this->posted
+                'posted'  => $this->posted,
+                'state'   => $this->state
              ));
         $this->id = $this->getMappingLayer()->lastInsertId();
     }
@@ -131,33 +144,34 @@ class Post extends \Hoa\Model {
                   ));
     }
 
-    public function getList ( $current_page, $post_per_page ) {
+    public function getList ( $current_page, $post_per_page, $state = Post::STATE_PUBLISHED ) {
 
-        if( $current_page > ceil($this->count()/$post_per_page) ) {
-            throw new \Hoathis\Model\Exception\NotFound("Page not found");
-        }
+      if( $current_page > ceil($this->count($state)/$post_per_page) ) {
+          throw new \Hoathis\Model\Exception\NotFound("Page not found");
+      }
 
-        $first_entry = ($current_page - 1) * $post_per_page;
+      $first_entry = ($current_page - 1) * $post_per_page;
 
-        $list = $this->getMappingLayer()
-                     ->prepare(
-                      'SELECT id, title, posted ' .
-                      'FROM post ' .
-                      'ORDER BY posted DESC ' .
-                      'LIMIT :first_entry, :post_per_page'
-                     )
-                     ->execute(array(
-                      'first_entry'   => $first_entry,
-                      'post_per_page' => $post_per_page,
-                     ))
-                     ->fetchAll();
+      $list = $this->getMappingLayer()
+                   ->prepare(
+                    'SELECT id, title, posted, state ' .
+                    'FROM post ' .
+	                  'WHERE (state = :state1 OR :state2 = -1)' .
+                    'ORDER BY posted DESC ' .
+                    'LIMIT :first_entry, :post_per_page'
+                   )
+                   ->bindParam(':state1', $state, PDO::PARAM_INT)
+                   ->bindParam(':state2', $state, PDO::PARAM_INT)
+                   ->bindParam(':first_entry', $first_entry, PDO::PARAM_INT)
+                   ->bindParam(':post_per_page', $post_per_page, PDO::PARAM_INT)
+                   ->fetchAll();
 
-        foreach($list as &$post) {
+      foreach($list as &$post) {
 
-          $post['normalized_title'] = Post::getNormalizedTitle($post['title']);
-        }
+        $post['normalized_title'] = Post::getNormalizedTitle($post['title']);
+      }
 
-        return $list;
+      return $list;
     }
 
     public static function getNormalizedTitle( $title ) {
@@ -174,13 +188,18 @@ class Post extends \Hoa\Model {
       return (string)$normalized_title;
     }
 
-    public function count ( ) {
+    public function count ( $state = Post::STATE_PUBLISHED ) {
 
-        return $this->getMappingLayer()
-                    ->query(
-                        'SELECT COUNT(*) FROM post'
-                    )
-                    ->fetchColumn();
+      return $this->getMappingLayer()
+                  ->prepare(
+                      'SELECT COUNT(*) ' .
+                      'FROM post ' .
+                      'WHERE (state = :state1 OR :state2 = -1)'
+                  )
+                  ->bindParam(':state1', $state, PDO::PARAM_INT)
+                  ->bindParam(':state2', $state, PDO::PARAM_INT)
+                  ->execute()
+                  ->fetchColumn();
     }
 }
 

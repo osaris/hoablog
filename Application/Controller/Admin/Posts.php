@@ -25,18 +25,21 @@ class Posts extends Base {
                  : 1;
     $post  = new \Application\Model\Post();
     try {
-      $list = $post->getList($page, $this->post_per_page);
+      $list = $post->getList($page,
+                             $this->post_per_page,
+                             \Application\Model\Post::STATE_ALL);
     }
     catch (\Hoathis\Model\Exception\NotFound $e) {
       $this->getKit('Redirector')
            ->redirect('posts', array('controller' => 'posts',
                                      'action'     => 'index'));
     }
+
     $this->data->title   = 'All posts';
     $this->data->posts   = $list;
 
     // TODO use a single variable for both values
-    $this->data->number  = ceil($post->count()/$this->post_per_page);
+    $this->data->number  = ceil($post->count(\Application\Model\Post::STATE_ALL)/$this->post_per_page);
     $this->data->current = $page;
 
     $this->view->addOverlay('hoa://Application/View/Admin/Posts/Index.xyl');
@@ -137,7 +140,8 @@ class Posts extends Base {
   protected function LoadPost ( $kit, $id ) {
 
     try {
-      $post = \Application\Model\Post::findById($id);
+      $post = \Application\Model\Post::findByIdAndState($id,
+                                                        \Application\Model\Post::STATE_ALL);
     }
     catch (\Hoathis\Model\Exception\NotFound $e) {
       $kit->getKit('Redirector')
