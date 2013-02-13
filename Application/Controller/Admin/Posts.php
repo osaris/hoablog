@@ -7,6 +7,9 @@ from('Application')
 -> import('Model.Post')
 -> import('Model.Comment');
 
+from('Hoa')
+-> import('Stringbuffer.Read');
+
 }
 
 namespace Application\Controller\Admin {
@@ -43,6 +46,37 @@ class Posts extends Base {
     $this->data->current = $page;
 
     $this->view->addOverlay('hoa://Application/View/Admin/Posts/Index.xyl');
+    $this->view->render();
+
+    return;
+  }
+
+  public function ShowAction ( $id ) {
+
+    $post              = $this->LoadPost($this, $id, \Application\Model\Post::STATE_ALL);
+
+    $this->data->title = $post->title;
+    $this->data->post  = $post;
+
+    $buffer = new \Hoa\Stringbuffer\Read();
+    $buffer->initializeWith(
+        '<?xml version="1.0" encoding="utf-8"?>' . "\n\n" .
+        '<fragment xmlns="http://hoa-project.net/xyl/xylophone">' . "\n".
+        '  <snippet id="main">' . "\n" .
+        $post->content .
+        '  </snippet>' . "\n" .
+        '</fragment>'
+    );
+    $this->view->addFragment(
+        $buffer->getStreamName(),
+        'content'
+    );
+
+    // TODO use post id from post in view
+    $this->data->post_id  = $post->id;
+    $this->data->comments = $post->comments;
+
+    $this->view->addOverlay('hoa://Application/View/Admin/Posts/Show.xyl');
     $this->view->render();
 
     return;

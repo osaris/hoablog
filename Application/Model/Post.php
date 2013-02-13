@@ -42,20 +42,23 @@ class Post extends \Hoa\Model {
         return;
     }
 
-    static public function findByIdAndState ( $id, $state = STATE_PUBLISHED ) {
+    static public function findByIdAndState ( $id, $state = Post::STATE_PUBLISHED ) {
 
         $post = new Post();
-        $data = $post->getMappingLayer()
-                     ->prepare(
+        $query = $post->getMappingLayer()
+                      ->prepare(
                          'SELECT id, posted, title, content, state ' .
                          'FROM   post ' .
-                         'WHERE  id = :id ' .
-                         'AND (state1 = :state OR :state2 = -1)'
-                     )
-                     ->bindParam(':id', $id, PDO::PARAM_INT)
-                     ->bindParam(':state1', $state, PDO::PARAM_INT)
-                     ->bindParam(':state2', $state, PDO::PARAM_INT)
-                     ->fetchAll();
+                         'WHERE  (id = :id) ' .
+                         'AND    (state = :state1 OR :state2 = -1)'
+                      );
+
+        $query->bindParameter(':id', $id, \PDO::PARAM_INT);
+        $query->bindParameter(':state1', $state, \PDO::PARAM_INT);
+        $query->bindParameter(':state2', $state, \PDO::PARAM_INT);
+
+        $data = $query->execute()
+                      ->fetchAll();
 
         if(!empty($data)) {
             $post->map($data[0]);
@@ -152,19 +155,21 @@ class Post extends \Hoa\Model {
 
       $first_entry = ($current_page - 1) * $post_per_page;
 
-      $list = $this->getMappingLayer()
-                   ->prepare(
-                    'SELECT id, title, posted, state ' .
-                    'FROM post ' .
-	                  'WHERE (state = :state1 OR :state2 = -1)' .
-                    'ORDER BY posted DESC ' .
-                    'LIMIT :first_entry, :post_per_page'
-                   )
-                   ->bindParam(':state1', $state, PDO::PARAM_INT)
-                   ->bindParam(':state2', $state, PDO::PARAM_INT)
-                   ->bindParam(':first_entry', $first_entry, PDO::PARAM_INT)
-                   ->bindParam(':post_per_page', $post_per_page, PDO::PARAM_INT)
-                   ->fetchAll();
+      $query = $this->getMappingLayer()
+                    ->prepare(
+                      'SELECT id, title, posted, state ' .
+                      'FROM   post ' .
+	                    'WHERE  (state = :state1 OR :state2 = -1)' .
+                      'ORDER  BY posted DESC ' .
+                      'LIMIT  :first_entry, :post_per_page'
+                    );
+      $query->bindParameter(':state1', $state, \PDO::PARAM_INT);
+      $query->bindParameter(':state2', $state, \PDO::PARAM_INT);
+      $query->bindParameter(':first_entry', $first_entry, \PDO::PARAM_INT);
+      $query->bindParameter(':post_per_page', $post_per_page, \PDO::PARAM_INT);
+
+      $list = $query->execute()
+                    ->fetchAll();
 
       foreach($list as &$post) {
 
@@ -190,16 +195,17 @@ class Post extends \Hoa\Model {
 
     public function count ( $state = Post::STATE_PUBLISHED ) {
 
-      return $this->getMappingLayer()
-                  ->prepare(
+      $query =  $this->getMappingLayer()
+                     ->prepare(
                       'SELECT COUNT(*) ' .
-                      'FROM post ' .
-                      'WHERE (state = :state1 OR :state2 = -1)'
-                  )
-                  ->bindParam(':state1', $state, PDO::PARAM_INT)
-                  ->bindParam(':state2', $state, PDO::PARAM_INT)
-                  ->execute()
-                  ->fetchColumn();
+                      'FROM   post ' .
+                      'WHERE  (state = :state1 OR :state2 = -1)'
+                    );
+      $query->bindParameter(':state1', $state, \PDO::PARAM_INT);
+      $query->bindParameter(':state2', $state, \PDO::PARAM_INT);
+
+      return $query->execute()
+                   ->fetchColumn();
     }
 }
 
