@@ -66,7 +66,7 @@ namespace Hoathis\Xyl\Interpreter\Html {
  * @license    New BSD License
  */
 
-class Html extends \Hoa\Xyl\Interpreter\Html { 
+class Html extends \Hoa\Xyl\Interpreter\Html {
 
     public function __construct ( ) {
 
@@ -75,5 +75,14 @@ class Html extends \Hoa\Xyl\Interpreter\Html {
         );
     }
 }
+
+}
+
+namespace {
+
+/**
+ * Flex entity.
+ */
+Hoa\Core\Consistency::flexEntity('Hoathis\Xyl\Interpreter\Html\Html');
 
 }
