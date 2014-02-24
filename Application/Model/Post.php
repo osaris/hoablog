@@ -157,7 +157,7 @@ class Post extends \Hoa\Model {
 
       $query = $this->getMappingLayer()
                     ->prepare(
-                      'SELECT id, title, posted, state ' .
+                      'SELECT id, title, posted, state, content ' .
                       'FROM   post ' .
 	                    'WHERE  (state = :state1 OR :state2 = -1)' .
                       'ORDER  BY posted DESC ' .

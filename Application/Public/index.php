@@ -23,10 +23,13 @@ Hoa\Database\Dal::initializeParameters(array(
     'connection.autoload'         => 'default'
 ));
 
+Hoa\Registry\Registry::set('config', include('hoa://Data/Etc/Configuration/HoaBlog.php'));
+
 $dispatcher = new Hoa\Dispatcher\Basic();
 $dispatcher->setKitName('Hoathis\Kit\Aggregator');
 $router     = new Hoa\Router\Http();
 $router->get('posts',       '/',                               'posts', 'index')
+       ->get('feed_rss2',    '/feeds/rss2',                    'feeds', 'rss2')
        ->get('post',        '/posts/(?<id>\d+)\-(?<normalized_title>.+)\.html', 'posts', 'show')
        ->post('create_comment',    '/posts/(?<post_id>\d+)/comments/create','comments', 'create')
        ->get('admin',       '/admin',                          'admin\log', 'in')
